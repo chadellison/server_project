@@ -23,5 +23,4 @@ class ServerTest < Minitest::Test
     response = Hurley.get("http://localhost:9292")
     assert_equal String, response.body.class
   end
-
 end
