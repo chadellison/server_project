@@ -8,54 +8,51 @@ class Server
     @client = client
     @tcp_server
     @requests = 0
+    @hello_counter = 0
+    @response
   end
 
   def respond
     generating_tcp_server
     accept_client
     store_request
+    until path == "Path: /shutdown"
 
-    if path == "Path: /"
+      if path == "Path: /"
+        response
+        client.puts headers
+        client.puts output
 
-      client.puts headers
-      client.puts output
+      elsif path == "Path: /hello"
+          hello_response
+          client.puts headers
+          client.puts output
+          @requests += 1
+
+      elsif path == "Path: /datetime"
+        date_response
+
+        client.puts headers
+        client.puts output
+
+      end
+      puts ["Wrote this response:", headers, output].join("\n")
       client.close
 
-    elsif path == "Path: /hello"
-      loop do
-
-        client.puts hello_header
-        client.puts hello_output
-        @requests += 1
-        accept_client
-
-        store_request
-      end
-
-    elsif
+      accept_client
+      @request_lines = []
+      store_request
     end
+    shutdown_response
+    client.puts headers
+    client.puts output
+    client.close
+    puts "\nResponse complete, exiting."
   end
 
   def generating_tcp_server(port = 9292)
     @tcp_server = TCPServer.new(port)
   end
-
-  def hello_response
-    "<pre>" + "Hello, World! (#{@requests})" + "</pre>"
-  end
-
-  def hello_output
-    "<html><head></head><body>#{hello_response}</body></html>"
-  end
-
-  def hello_header
-    ["http/1.1 200 ok",
-      "date: #{Time.now.strftime('%a, %e %b %Y %H:%M:%S %z')}",
-      "server: ruby",
-      "content-type: text/html; charset=iso-8859-1",
-      "content-length: #{hello_output.length}\r\n\r\n"].join("\r\n")
-  end
-
 
   def accept_client
     @client = @tcp_server.accept
@@ -96,11 +93,26 @@ class Server
   end
 
   def response
-    "<pre>" + verb + path + protocol + host + port + origin + accept + "</pre>"
+    @response = "<pre>" + verb + path + protocol + host + port + origin + accept + "</pre>"
+  end
+
+  def hello_response
+    @response = "<pre>" + "Hello, World! (#{@hello_counter})" + "</pre>"
+    @hello_counter += 1
+  end
+
+  def date_response
+    date = Time.now
+    date = date.strftime("%I:%M%p on %A, %B %d, %Y")
+    @response = "<pre>" + "#{date}" + "</pre>"
+  end
+
+  def shutdown_response
+    @response = "<pre>" + "Total Requests: #{@requests}" + "</pre>"
   end
 
   def output
-    "<html><head></head><body>#{response}</body></html>"
+    "<html><head></head><body>#{@response}</body></html>"
   end
 
   def headers
