@@ -1,33 +1,36 @@
 require 'socket'
 
 class Server
-  attr_accessor :client, :request_lines
+  attr_accessor :client, :request_lines, :hello_count
 
   def initialize(client = nil)
     @request_lines = []
     @client = client
     @tcp_server
     @requests = 0
-    @hello_counter = 0
     @response
+    @hello_count = 0
+    @shutdown = false
   end
 
   def respond
     generating_tcp_server
-    accept_client
-    store_request
-    until path == "Path: /shutdown"
+    until @shutdown == true
+      accept_client
+      @request_lines = []
+      store_request
 
+      @requests += 1
       if path == "Path: /"
         response
         client.puts headers
         client.puts output
 
       elsif path == "Path: /hello"
+
           hello_response
           client.puts headers
           client.puts output
-          @requests += 1
 
       elsif path == "Path: /datetime"
         date_response
@@ -35,19 +38,16 @@ class Server
         client.puts headers
         client.puts output
 
+      elsif path == "Path: /shutdown"
+        shutdown_response
+        client.puts headers
+        client.puts output
       end
       puts ["Wrote this response:", headers, output].join("\n")
       client.close
+      puts "\nResponse complete, exiting."
 
-      accept_client
-      @request_lines = []
-      store_request
     end
-    shutdown_response
-    client.puts headers
-    client.puts output
-    client.close
-    puts "\nResponse complete, exiting."
   end
 
   def generating_tcp_server(port = 9292)
@@ -97,8 +97,8 @@ class Server
   end
 
   def hello_response
-    @response = "<pre>" + "Hello, World! (#{@hello_counter})" + "</pre>"
-    @hello_counter += 1
+    @response = "<pre>" + "Hello, World! (#{hello_count})" + "</pre>"
+    @hello_count += 1
   end
 
   def date_response
@@ -109,6 +109,7 @@ class Server
 
   def shutdown_response
     @response = "<pre>" + "Total Requests: #{@requests}" + "</pre>"
+    @shutdown = true
   end
 
   def output
