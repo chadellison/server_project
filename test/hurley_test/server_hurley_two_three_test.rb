@@ -33,4 +33,14 @@ class ServerTest < Minitest::Test
     client = Hurley::Client.new "localhost:9292"
     assert_equal 'localhost', client.scheme
   end
+
+  def test_the_hello_path_returns_hello_world_and_increments_the_hello_counter
+    response = Hurley.get("http://localhost:9292/hello")
+    assert_equal "<html><head></head><body><pre>Hello, World! (1)</pre></body></html>", response.body
+    response = Hurley.get("http://localhost:9292/hello")
+    response = Hurley.get("http://localhost:9292/hello")
+    response = Hurley.get("http://localhost:9292/hello")
+    response = Hurley.get("http://localhost:9292/hello")
+    assert_equal "<html><head></head><body><pre>Hello, World! (5)</pre></body></html>", response.body
+  end
 end
