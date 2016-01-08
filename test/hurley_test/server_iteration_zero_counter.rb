@@ -1,5 +1,5 @@
 require 'minitest/autorun'
-require_relative '../lib/server_iteration_zero'
+require_relative '../../lib/server_iteration_zero'
 require 'socket'
 require 'hurley'
 
