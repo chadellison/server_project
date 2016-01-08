@@ -2,16 +2,12 @@ require 'socket'
 
 class Request
   attr_accessor :client
-  def initialize
-    @client #prob don't need
-    @tcp_server # prb no need
-  end
 
   def generating_tcp_server(port = 9292) #consider moving to server class --> not part of reaquest
     @tcp_server = TCPServer.new(port)
   end
 
-  def accept_client
+  def open_server
     @client = @tcp_server.accept
   end
 
