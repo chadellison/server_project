@@ -1,5 +1,5 @@
-require_relative 'response_two'
-require_relative 'parse_two'
+require_relative 'response_three'
+require_relative 'parse_three'
 require 'socket'
 
 class Server
@@ -22,12 +22,13 @@ class Server
       response.hello_response(hello_count)
     elsif parse.path == "Path: /datetime"
       response.date_response
+    elsif parse.path == "Path: /word_search"
+      response.word_search_response
     elsif parse.path == "Path: /shutdown"
       response.shutdown_response(request_counter)
       @shutdown = true
     end
   end
-
 
   def respond
     request = Request.new

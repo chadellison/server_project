@@ -3,7 +3,7 @@ require 'socket'
 class Request
   attr_accessor :client
 
-  def generating_tcp_server(port = 9292)
+  def generating_tcp_server(port = 9292) 
     @tcp_server = TCPServer.new(port)
   end
 

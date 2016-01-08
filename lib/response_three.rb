@@ -1,4 +1,4 @@
-require_relative 'parse_two'
+require_relative 'parse_three'
 
 class Response
   attr_reader :request_lines
@@ -29,6 +29,12 @@ class Response
     date = Time.now
     date = date.strftime("%I:%M%p on %A, %B %d, %Y")
     @response = "<pre>" + "#{date}" + "</pre>"
+    formatted_response
+  end
+
+  def word_search_response
+    parse = Parse.new(request_lines)
+    @response = "<pre>" + parse.word + "</pre>"
     formatted_response
   end
 
