@@ -1,7 +1,5 @@
 require 'minitest/autorun'
 require_relative '../../lib/server_iteration_zero'
-require_relative '../../lib/server_iteration_two'
-require_relative '../../lib/server_iteration_three'
 require 'socket'
 require 'hurley'
 
@@ -16,5 +14,7 @@ class ServerTest < Minitest::Test
     assert_equal String, response.body.class
     assert_equal Hurley::Header, response.header.class
     assert_equal 200, response.status_code
+    client = Hurley::Client.new "localhost:9292"
+    assert_equal 'localhost', client.scheme
   end
 end
